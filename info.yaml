@@ -1,6 +1,6 @@
 # Tiny Tapeout project information
 project:
-  title:        "4-bit Counter"      # Project title
+  title:        "4-bit"      # Project title
   author:       "Dron Sankhala"                   # Your name
   discord:      ""                   # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "A simple 4-bit counter with synchronous reset."  # One line description of what your project does
