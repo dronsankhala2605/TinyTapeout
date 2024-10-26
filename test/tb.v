@@ -17,7 +17,7 @@ module test_tb();
  reg clock,reset;
 wire [3:0]count;
 
-test dut(.clock(clock),.reset(reset),.count(count));
+tt_um_test dut(.clock(clock),.reset(reset),.count(count));
 
 initial
  begin
