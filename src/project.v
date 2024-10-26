@@ -5,7 +5,7 @@
 
 `default_nettype none
 
-module test( input wire clock,reset,
+module tt_um_test( input wire clock,reset,
              output reg [3:0]count );
                 
            // design functionality
