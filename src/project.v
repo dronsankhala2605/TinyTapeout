@@ -16,21 +16,32 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module tt_um_devider( input wire clk,
-                   input wire rst_n,
-                   input wire [7:0]ui_in,
-                   output reg clock_dummy
-                 );
+module tt_um_devider( input  wire [7:0] ui_in,    // Dedicated inputs
+                      output wire [7:0] uo_out,   // Dedicated outputs
+                      input  wire [7:0] uio_in,   // IOs: Input path
+                      output wire [7:0] uio_out,  // IOs: Output path
+                      output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
+                      input  wire       ena,      // always 1 when the design is powered, so you can ignore it
+                      input  wire       clk,      // clock
+                      input  wire       rst_n     // reset_n - low to reset
+                   );
             
           reg [25:0]count;
           reg [25:0]devider;
               
         // design functionality
         
-        
+        // Set unused outputs and IOs to 0
+        assign uio_out = 8'b0;
+        assign uio_oe = 8'b0;
+        assign uo_out[6:0] = 7'b0;
+
+        // final assignment
+         assign uo_out[7] = clock_dummy;
+  
         always @(posedge clk)  // input clock frequency is 60 MHz
            begin
-            case (in)
+            case (ui_in)
              8'd1: begin
                      devider <= 26'd59999999; // 1 Hz output frequency
                    end
@@ -229,10 +240,12 @@ module tt_um_devider( input wire clk,
            count <= count + 1'd1;
          end
 
-       always @(in, devider)
+       always @(ui_in, devider)
         begin
          count <= 26'd0;
          clock_dummy <= 1'd0;
         end
-        
+
+  wire _unused = &{ena,uio_in, 1'b0};
+  
  endmodule
