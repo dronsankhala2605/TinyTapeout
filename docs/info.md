@@ -9,6 +9,18 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-The 4 bit ALU (Arithmetic Logic Unit) has 2 inputs of 4 bits for each operand, 1 input of 3 bits to select the operational mode, 1 output of 8 bits with the result of the selected operation and 2 outputs of 1 bit each to identify an overflow or zero.
+This project implements an 8-bit carry-skip adder using a combination of ripple-carry and skip logic for enhanced performance. The adder is divided into two 4-bit sections. The lower 4 bits compute the initial partial sum and generate a carry-out, which is then either passed directly to the upper 4-bit section or skipped, depending on the carry-propagate signal. This design reduces the delay associated with carry propagation, making it more efficient than a conventional ripple-carry adder. The final 8-bit sum is registered and outputted in sync with the clock signal.
 
-To test the design, the opcode was configured for addition (000), substraction (001), multiplication (010), division (011) and for zero (100).
+## How to test
+
+To test the carry-skip adder:
+1. Load the design into your simulation environment.
+2. Set the `ui_in` and `uio_in` inputs with the desired 8-bit values for addition.
+3. The result of the addition will appear on `uo_out` after each rising edge.
+4. Verify that the output matches expected values by comparing `uo_out` with the sum of the inputs.
+
+For more extensive testing, a testbench can be used to automate input combinations and check results across various cases.
+
+## External hardware
+
+No external hardware is required for this project.
