@@ -28,6 +28,7 @@ module tt_um_devider( input  wire [7:0] ui_in,    // Dedicated inputs
             
           reg [25:0]count;
           reg [25:0]devider;
+          reg clock_dummy;
               
         // design functionality
         
