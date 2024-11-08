@@ -1,11 +1,10 @@
 `default_nettype none
 `timescale 1ns / 1ps
 
+/* This testbench just instantiates the module and makes some convenient wires
+   that can be driven / tested by the cocotb test.py.
+*/
 module tb ();
-
-  // Declare continuous signals for power and ground
-  wire VPWR = 1'b1;  // Power supply
-  wire VGND = 1'b0;  // Ground
 
   // Dump the signals to a VCD file. You can view it with gtkwave.
   initial begin
@@ -23,35 +22,28 @@ module tb ();
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
-
-  // Clock generation
-  initial begin
-    clk = 0;
-    forever #5 clk = ~clk; // 10 ns clock period
-  end
-
-  // Reset and enable signals
-  initial begin
-    rst_n = 0;
-    ena = 0;
-    #10 rst_n = 1; // Release reset after 10ns
-    #10 ena = 1;   // Enable after 20ns
-  end
-
-  // Instantiate your ALU module
-  tt_um_alf19185_ALU U1 (
 `ifdef GL_TEST
-      .VPWR(VPWR),  // Connect to power using wire
-      .VGND(VGND),  // Connect to ground using wire
+  wire VPWR = 1'b1;
+  wire VGND = 1'b0;
 `endif
-      .ui_in  (ui_in),
-      .uo_out (uo_out),
-      .uio_in (uio_in),
-      .uio_out(uio_out),
-      .uio_oe (uio_oe),
-      .ena    (ena),
-      .clk    (clk),
-      .rst_n  (rst_n)
+
+// Replace tt_um_example with your module name:
+  tt_um_CLA8 user_project (
+
+      // Include power ports for the Gate Level test:
+`ifdef GL_TEST
+      .VPWR(VPWR),
+      .VGND(VGND),
+`endif
+
+      .ui_in  (a),    // Dedicated inputs
+      .uo_out (sum),   // Dedicated outputs
+      .uio_in (b),   // IOs: Input path
+      .uio_out(uio_out),  // IOs: Output path
+      .uio_oe (uio_oe),   // IOs: Enable path (active high: 0=input, 1=output)
+      .ena    (ena),      // enable - goes high when design is selected
+      .clk    (clk),      // clock
+      .rst_n  (rst_n)     // not reset
   );
 
 endmodule
