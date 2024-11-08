@@ -246,6 +246,6 @@ module tt_um_devider( input  wire [7:0] ui_in,    // Dedicated inputs
          clock_dummy <= 1'd0;
         end
 
-  wire _unused = &{ena,uio_in, 1'b0};
+  wire _unused = &{ena, uio_in, 1'b0};
   
  endmodule
