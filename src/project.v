@@ -34,10 +34,10 @@ module tt_um_devider( input  wire [7:0] ui_in,    // Dedicated inputs
         // Set unused outputs and IOs to 0
         assign uio_out = 8'b0;
         assign uio_oe = 8'b0;
-        assign uo_out[6:0] = 7'b0;
+        assign uo_out[7:1] = 7'b0;
 
         // final assignment
-         assign uo_out[7] = clock_dummy;
+        assign uo_out[0] = clock_dummy;
   
         always @(posedge clk)  // input clock frequency is 60 MHz
            begin
