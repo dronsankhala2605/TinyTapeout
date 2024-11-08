@@ -16,8 +16,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module tt_um_test( input wire clock,reset,
-                   input wire [7:0]in,
+module tt_um_devider( input wire clk,
+                   input wire rst_n,
+                   input wire [7:0]ui_in,
                    output reg clock_dummy
                  );
             
@@ -27,7 +28,7 @@ module tt_um_test( input wire clock,reset,
         // design functionality
         
         
-        always @(posedge clock)  // input clock frequency is 60 MHz
+        always @(posedge clk)  // input clock frequency is 60 MHz
            begin
             case (in)
              8'd1: begin
@@ -211,9 +212,9 @@ module tt_um_test( input wire clock,reset,
           end
 
           
-        always @(posedge clock, negedge reset)
+        always @(posedge clk, negedge rst_n)
          begin
-          if(!reset)
+          if(!rst_n)
            begin
             count <= 26'd0;
             clock_dummy <= 1'd0;
