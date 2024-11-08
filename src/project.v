@@ -240,7 +240,12 @@ module tt_um_devider( input  wire [7:0] ui_in,    // Dedicated inputs
           else
            count <= count + 1'd1;
          end
-
+  
+       always @(ui_in)
+        begin
+         count <= 26'd0;
+         clock_dummy <= 1'd0;
+        end
        
 
   wire _unused = &{ena, uio_in, 1'b0};
