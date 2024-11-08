@@ -241,7 +241,7 @@ module tt_um_devider( input  wire [7:0] ui_in,    // Dedicated inputs
            count <= count + 1'd1;
          end
 
-       always @(ui_in, devider)
+       always @(ui_in)
         begin
          count <= 26'd0;
          clock_dummy <= 1'd0;
