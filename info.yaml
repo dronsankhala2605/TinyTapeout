@@ -1,6 +1,6 @@
 # Tiny Tapeout project information
 project:
-  title:        "carry_skip_adder"      # Project title
+  title:        "carry skip adder"      # Project title
   author:       "Dron Sankhala"      # Your name
   discord:      "na"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "two 8-bit input adder"      # One line description of what your project does
