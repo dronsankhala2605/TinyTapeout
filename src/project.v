@@ -16,7 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module tt_um_devider(
+module tt_um_devider (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
@@ -27,101 +27,49 @@ module tt_um_devider(
     input  wire       rst_n     // reset_n - low to reset
 );
 
-    reg [25:0] count;
-    reg [25:0] devider;
-    reg clock_dummy;
+  // All output pins must be assigned. If not used, assign to 0.
+  array_mult_structural array_mult_inst (
+      .m(ui_in[3:0]),
+      .q(ui_in[7:4]),
+      .p(uo_out)
+  );
 
-    // Set unused outputs and IOs to 0
-    assign uio_out = 8'b0;
-    assign uio_oe = 8'b0;
-    assign uo_out[7:1] = 7'b0;
+  assign uio_out = 0;
+  assign uio_oe  = 0;
 
-    // final assignment
-    assign uo_out[0] = clock_dummy;
+  // List all unused inputs to prevent warnings
+  wire _unused = &{ena, clk, rst_n, 1'b0, uio_in};
+endmodule
 
-    // Frequency divider setting based on `ui_in`
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            devider <= 26'd59999999; // Default to 1 Hz on reset
-        end else begin
-            case (ui_in)
-                8'd1:   devider <= 26'd59999999;  // 1 Hz output frequency
-                8'd2:   devider <= 26'd29999999;  // 2 Hz output frequency
-                8'd3:   devider <= 26'd1999999;   // 3 Hz output frequency
-                8'd4:   devider <= 26'd1499999;   // 4 Hz output frequency 
-                8'd5:   devider <= 26'd1199999;   // 5 Hz output frequency
-                8'd6:   devider <= 26'd999999;    // 6 Hz output frequency
-                8'd8:   devider <= 26'd749999;    // 8 Hz output frequency
-                8'd10:  devider <= 26'd599999;    // 10 Hz output frequency
-                8'd12:  devider <= 26'd499999;    // 12 Hz output frequency
-                8'd15:  devider <= 26'd399999;    // 15 Hz output frequency
-                8'd16:  devider <= 26'd374999;    // 16 Hz output frequency
-                8'd20:  devider <= 26'd299999;    // 20 Hz output frequency
-                8'd24:  devider <= 26'd249999;    // 24 Hz output frequency
-                8'd25:  devider <= 26'd239999;    // 25 Hz output frequency
-                8'd30:  devider <= 26'd199999;    // 30 Hz output frequency
-                8'd40:  devider <= 26'd149999;    // 40 Hz output frequency
-                8'd48:  devider <= 26'd124999;    // 48 Hz output frequency
-                8'd50:  devider <= 26'd119999;    // 50 Hz output frequency
-                8'd60:  devider <= 26'd99999;     // 60 Hz output frequency
-                8'd75:  devider <= 26'd79999;     // 75 Hz output frequency
-                8'd80:  devider <= 26'd74999;     // 80 Hz output frequency
-                8'd100: devider <= 26'd59999;     // 100 Hz output frequency
-                8'd200: devider <= 26'd299999;    // 200 Hz output frequency
-                8'd201: devider <= 26'd199999;    // 300 Hz output frequency
-                8'd202: devider <= 26'd149999;    // 400 Hz output frequency
-                8'd203: devider <= 26'd119999;    // 500 Hz output frequency
-                8'd204: devider <= 26'd99999;     // 600 Hz output frequency
-                8'd205: devider <= 26'd74999;     // 800 Hz output frequency
-                8'd206: devider <= 26'd59999;     // 1 KHz output frequency
-                8'd207: devider <= 26'd29999;     // 2 KHz output frequency
-                8'd208: devider <= 26'd19999;     // 3 KHz output frequency
-                8'd209: devider <= 26'd14999;     // 4 KHz output frequency
-                8'd210: devider <= 26'd11999;     // 5 KHz output frequency
-                8'd211: devider <= 26'd9999;      // 6 KHz output frequency
-                8'd212: devider <= 26'd7499;      // 8 KHz output frequency
-                8'd213: devider <= 26'd5999;      // 10 KHz output frequency
-                8'd214: devider <= 26'd2999;      // 20 KHz output frequency
-                8'd215: devider <= 26'd1999;      // 30 KHz output frequency
-                8'd216: devider <= 26'd1499;      // 40 KHz output frequency
-                8'd217: devider <= 26'd1199;      // 50 KHz output frequency
-                8'd218: devider <= 26'd999;       // 60 KHz output frequency
-                8'd219: devider <= 26'd749;       // 80 KHz output frequency
-                8'd220: devider <= 26'd599;       // 100 KHz output frequency
-                8'd221: devider <= 26'd299;       // 200 KHz output frequency
-                8'd222: devider <= 26'd199;       // 300 KHz output frequency
-                8'd223: devider <= 26'd149;       // 400 KHz output frequency
-                8'd224: devider <= 26'd119;       // 500 KHz output frequency
-                8'd225: devider <= 26'd99;        // 600 KHz output frequency
-                8'd226: devider <= 26'd74;        // 800 KHz output frequency
-                8'd227: devider <= 26'd59;        // 1 MHz output frequency
-                8'd228: devider <= 26'd29;        // 2 MHz output frequency
-                8'd229: devider <= 26'd19;        // 3 MHz output frequency
-                8'd230: devider <= 26'd14;        // 4 MHz output frequency
-                8'd231: devider <= 26'd11;        // 5 MHz output frequency
-                8'd232: devider <= 26'd9;         // 6 MHz output frequency
-                8'd233: devider <= 26'd5;         // 10 MHz output frequency
-                8'd234: devider <= 26'd2;         // 20 MHz output frequency
-                8'd235: devider <= 26'd1;         // 30 MHz output frequency
-                default: devider <= 26'd59999999; // Default 1 Hz output frequency if input is outside range
-            endcase
-        end
-    end
+module array_mult_structural (
+    input [3:0] m,
+    input [3:0] q,
+    output [7:0] p
+);
+    wire cout1, cout2, cout3, cout4, cout5, cout6, cout7, cout8, cout9, cout10, cout11, cout12;
+    wire s2, s3, s4, s6, s7, s8;
+    assign p[0] = m[0] & q[0];
+    full_adder fa1 (m[1] & q[0], m[0] & q[1], 1'b0, p[1], cout1);
+    full_adder fa2 (m[2] & q[0], m[1] & q[1], cout1, s2, cout2);
+    full_adder fa3 (m[3] & q[0], m[2] & q[1], cout2, s3, cout3);
+    full_adder fa4 (1'b0, m[3] & q[1], cout2, s4, cout4);
+    full_adder fa5 (s2, m[0] & q[2], 1'b0, p[2], cout5);
+    full_adder fa6 (s3, m[1] & q[2], cout5, s6, cout6);
+    full_adder fa7 (s4, m[2] & q[2], cout6, s7, cout7);
+    full_adder fa8 (m[3] & q[2], cout4, cout7, s8, cout8);
+    full_adder fa9 (m[0] & q[3], s6, 1'b0, p[3], cout9);
+    full_adder fa10 (m[1] & q[3], s7, cout9, p[4], cout10);
+    full_adder fa11 (m[2] & q[3], s8, cout10, p[5], cout11);
+    full_adder fa12 (m[3] & q[3], cout8, cout11, p[6], p[7]);
 
-    // Counter and clock divider functionality
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            count <= 26'd0;
-            clock_dummy <= 1'b0;
-        end else if (count == devider) begin
-            count <= 26'd0;
-            clock_dummy <= ~clock_dummy;
-        end else begin
-            count <= count + 1'b1;
-        end
-    end
 
-    // Handling unused input signals
-    wire _unused = &{ena, uio_in, 1'b0};
+endmodule
+
+module full_adder (
+    input a,b,cin,
+    output sum,carry
+);
+    assign sum = a ^ b ^ cin;
+    assign carry = (a & b) | (b & cin)  | (cin & a) ;
 
 endmodule
