@@ -39,7 +39,7 @@ module tb ();
   end
 
   // Instantiate your ALU module
-  tt_um_alf19185_ALU U1 (
+  tt_um_ALU U1 (
 `ifdef GL_TEST
       .VPWR(VPWR),  // Connect to power using wire
       .VGND(VGND),  // Connect to ground using wire
