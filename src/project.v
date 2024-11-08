@@ -1,75 +1,91 @@
+
 /*
- * Copyright (c) 2024 Your Name
+ * Copyright (c) 2024 Gabriela Alfaro
  * SPDX-License-Identifier: Apache-2.0
  */
 
 `default_nettype none
 
-//////////////////////////////////////////////////////////////////////////////////
-// Company: IIT JMU
-// Engineer: Dron Sankhala
-// 
-// Create Date: 11/06/2024 10:15:09 PM
-// Design Name: tiny_tapeout
-// Module Name: top_module
-// Project Name: custom frequency divider for tiny tapeout
-//////////////////////////////////////////////////////////////////////////////////
-
-
-module tt_um_devider (
+module tt_um_alf19185_ALU (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
     output wire [7:0] uio_out,  // IOs: Output path
     output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
-    input  wire       ena,      // always 1 when the design is powered, so you can ignore it
-    input  wire       clk,      // clock
-    input  wire       rst_n     // reset_n - low to reset
+    input  wire       ena,      // Always 1 when the design is powered, so you can ignore it
+    input  wire       clk,      // Clock (not used for combinational ALU)
+    input  wire       rst_n     // Reset (not used for combinational ALU)
 );
 
-  // All output pins must be assigned. If not used, assign to 0.
-  array_mult_structural array_mult_inst (
-      .m(ui_in[3:0]),
-      .q(ui_in[7:4]),
-      .p(uo_out)
-  );
+    // Map the ALU inputs and outputs to the provided ports
+    wire [3:0] A = ui_in[3:0];         // Lower 4 bits of ui_in are A
+    wire [3:0] B = ui_in[7:4];         // Upper 4 bits of ui_in are B
+    wire [2:0] Opcode = uio_in[2:0];   // Use lower 3 bits of uio_in for Opcode
 
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+    reg [7:0] ALU_Result;
+    reg Carry;
+    reg Zero;
 
-  // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0, uio_in};
-endmodule
+    // Assign ALU outputs to uo_out
+    assign uo_out[7:0] = {Zero, Carry, ALU_Result[5:0]}; // Concatenate Zero, Carry, and the lower 6 bits of ALU_Result
 
-module array_mult_structural (
-    input [3:0] m,
-    input [3:0] q,
-    output [7:0] p
-);
-    wire cout1, cout2, cout3, cout4, cout5, cout6, cout7, cout8, cout9, cout10, cout11, cout12;
-    wire s2, s3, s4, s6, s7, s8;
-    assign p[0] = m[0] & q[0];
-    full_adder fa1 (m[1] & q[0], m[0] & q[1], 1'b0, p[1], cout1);
-    full_adder fa2 (m[2] & q[0], m[1] & q[1], cout1, s2, cout2);
-    full_adder fa3 (m[3] & q[0], m[2] & q[1], cout2, s3, cout3);
-    full_adder fa4 (1'b0, m[3] & q[1], cout2, s4, cout4);
-    full_adder fa5 (s2, m[0] & q[2], 1'b0, p[2], cout5);
-    full_adder fa6 (s3, m[1] & q[2], cout5, s6, cout6);
-    full_adder fa7 (s4, m[2] & q[2], cout6, s7, cout7);
-    full_adder fa8 (m[3] & q[2], cout4, cout7, s8, cout8);
-    full_adder fa9 (m[0] & q[3], s6, 1'b0, p[3], cout9);
-    full_adder fa10 (m[1] & q[3], s7, cout9, p[4], cout10);
-    full_adder fa11 (m[2] & q[3], s8, cout10, p[5], cout11);
-    full_adder fa12 (m[3] & q[3], cout8, cout11, p[6], p[7]);
+    // Set unused outputs and IOs to 0
+    assign uio_out = 8'b0;
+    assign uio_oe = 8'b0;
 
+    // ALU Logic
+    always @(*) begin
+        // Default flags
+        Carry = 1'b0;
+        Zero = 1'b0;
+        ALU_Result = 8'b0;
 
-endmodule
+        case (Opcode)
+            3'b000: begin  // Addition
+                {Carry, ALU_Result} = {1'b0, A} + {1'b0, B}; 
+                Zero = (ALU_Result == 8'b0);
+            end
+            3'b001: begin  // Subtraction
+                ALU_Result = A - B;
+                Zero = (ALU_Result == 8'b0);
+            end
+            3'b010: begin  // Multiplication
+                ALU_Result = A * B;
+                Zero = (ALU_Result == 8'b0);
+            end
+            3'b011: begin  // Division
+                if (B != 0) begin
+                    ALU_Result = A / B;
+                    Zero = (ALU_Result == 8'b0);
+                end else begin
+                    ALU_Result = 8'b00000000;  // Set result to zero on division by zero
+                    Zero = 1'b1;               // Set ZeroFlag to indicate division by zero
+                end
+            end
+            3'b100: begin  // AND
+                ALU_Result = A & B;
+                Zero = (ALU_Result == 8'b0);
+            end
+            3'b101: begin  // OR
+                ALU_Result = A | B;
+                Zero = (ALU_Result == 8'b0);
+            end
+            3'b110: begin  // NOT
+                ALU_Result = ~A;
+                Zero = (ALU_Result == 8'b0);
+            end
+            3'b111: begin  // XOR
+                ALU_Result = A ^ B;
+                Zero = (ALU_Result == 8'b0);
+            end
+            default: begin
+                ALU_Result = 8'b00000000;
+                Zero = 1'b1;
+            end
+        endcase
+    end
 
-module full_adder (
-    input a,b,cin,
-    output sum,carry
-);
-    assign sum = a ^ b ^ cin;
-    assign carry = (a & b) | (b & cin)  | (cin & a) ;
+    // List all unused inputs to prevent warnings
+    wire _unused = &{ena, clk, rst_n, 1'b0};
 
 endmodule
