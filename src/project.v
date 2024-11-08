@@ -5,7 +5,7 @@
 
 `default_nettype none
 
-module tt_um_carryskip_adder8 (
+module tt_um_carryskip_adder9 (
     input  wire [7:0] ui_in,    // a input
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // b input
